@@ -67,6 +67,11 @@
 ;; Right Alt (option) can be used to enter symbols like em dashes '—' and euros '€' and stuff.
 (setq mac-right-option-modifier 'nil)
 
+(global-set-key (kbd "M-3") (lambda () (interactive) (insert "#")))
+(global-set-key (kbd "M-n") (lambda () (interactive) (insert "~")))
+(global-set-key (kbd "M-g") (lambda () (interactive) (insert "@")))
+(global-set-key (kbd "M-7") (lambda () (interactive) (insert "|")))
+
 ;; Control is control, and you also need to change Caps Lock to Control in the Keyboard
 ;; preferences in macOS.
 
@@ -176,14 +181,9 @@
 (setq-default frame-title-format "%b (%f)")
 
 ;; Never use tabs, use spaces instead.
-(setq tab-width 2)
-(setq js-indent-level 2)
-(setq css-indent-offset 2)
-(setq c-basic-offset 2)
 (setq-default indent-tabs-mode nil)
-(setq-default c-basic-offset 2)
-(setq-default tab-width 2)
-(setq-default c-basic-indent 2)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
 
 ;; Show keybindings cheatsheet
 (which-key-mode)
@@ -422,10 +422,3 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "C-x c") (lambda () (interactive) (find-file "~/.emacs.d/private.el")))
 
 (evil-mode 1)
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
