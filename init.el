@@ -198,18 +198,18 @@
 (global-set-key (kbd "s-i") 'previous-line)
 (global-set-key (kbd "s-k") 'next-line)
 (global-set-key (kbd "s-j") 'left-char)
-(global-set-key (kbd "s-l") 'right-char)$1;; Kill line with CMD-Backspace. Note that thanks to Simpleclip, killing doesn't rewrite the system clipboard.
+(global-set-key (kbd "s-l") 'right-char) ;; Kill line with CMD-Backspace. Note that thanks to Simpleclip, killing doesn't rewrite the system clipboard.
 ;; Kill one word with Alt+Backspace.
 ;; Kill forward word with Alt-Shift-Backspace.
 (global-set-key (kbd "s-<backspace>") 'kill-whole-line)
-(global-set-key (kbd "M-S-<backspace>") 'kill-word)$1;; Use Cmd for movement and selection.
+(global-set-key (kbd "M-S-<backspace>") 'kill-word)   ;; Use Cmd for movement and selection.
 (global-set-key (kbd "s-<right>") (kbd "C-e"))        ;; End of line
 (global-set-key (kbd "S-s-<right>") (kbd "C-S-e"))    ;; Select to end of line
 (global-set-key (kbd "s-<left>") (kbd "M-m"))         ;; Beginning of line (first non-whitespace character)
 (global-set-key (kbd "S-s-<left>") (kbd "M-S-m"))     ;; Select to beginning of line
 
 (global-set-key (kbd "s-<up>") 'beginning-of-buffer)  ;; First line
-(global-set-key (kbd "s-<down>") 'end-of-buffer)      ;; Last line$1;; Thanks to Bozhidar Batsov
+(global-set-key (kbd "s-<down>") 'end-of-buffer)      ;; Last line ;; Thanks to Bozhidar Batsov
 ;; http://emacsredux.com/blog/2013/]05/22/smarter-navigation-to-the-beginning-of-a-line/
 (defun smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
@@ -298,7 +298,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; Visually find and replace text
 (define-key global-map (kbd "M-s-f") 'vr/replace)
-(define-key global-map (kbd "s-r") 'vr/replace)  ;; Cmd+r find and replace$1;; Multiple cursors. Similar to Sublime or VS Code.
+(define-key global-map (kbd "s-r") 'vr/replace)  ;; Cmd+r find and replace ;; Multiple cursors. Similar to Sublime or VS Code.
 (setq mc/always-run-for-all 1)
 (global-set-key (kbd "s-d") 'mc/mark-next-like-this)        ;; Cmd+d select next occurrence of region
 (global-set-key (kbd "s-D") 'mc/mark-all-dwim)              ;; Cmd+Shift+d select all occurrences
@@ -308,12 +308,12 @@ point reaches the beginning or end of the buffer, stop there."
 ;; This is rather radical, but saves from a lot of pain in the ass.
 ;; When split is automatic, always split windows vertically
 (setq split-height-threshold 0)
-(setq split-width-threshold nil)$1;; Go to other windows easily with one keystroke Cmd-something.
+(setq split-width-threshold nil) ;; Go to other windows easily with one keystroke Cmd-something.
 (global-set-key (kbd "s-1") (kbd "C-x 1"))  ;; Cmd-1 kill other windows (keep 1)
 (global-set-key (kbd "s-2") (kbd "C-x 2"))  ;; Cmd-2 split horizontally
 (global-set-key (kbd "s-3") (kbd "C-x 3"))  ;; Cmd-3 split vertically
 (global-set-key (kbd "s-0") (kbd "C-x 0"))  ;; Cmd-0...
-(global-set-key (kbd "s-w") (kbd "C-x 0"))  ;; ...and Cmd-w to close current window$1;; Move between windows with Control-Command-Arrow and with =Cmd= just like in iTerm.
+(global-set-key (kbd "s-w") (kbd "C-x 0"))  ;; ...and Cmd-w to close current window ;; Move between windows with Control-Command-Arrow and with =Cmd= just like in iTerm.
 (global-set-key (kbd "<C-s-left>")  'windmove-left)  ;; Ctrl+Cmd+left go to left window
 (global-set-key (kbd "s-[")  'windmove-left)         ;; Cmd+[ go to left window
 
@@ -324,7 +324,7 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "s-{")  'windmove-up)           ;; Cmd+Shift+[ go to upper window
 
 (global-set-key (kbd "<C-s-down>")  'windmove-down)  ;; Ctrl+Cmd+down go to down window
-(global-set-key (kbd "s-}")  'windmove-down)        ;; Cmd+Shift+] got to down window$1;; Enable winner mode to quickly restore window configurations
+(global-set-key (kbd "s-}")  'windmove-down)        ;; Cmd+Shift+] got to down window ;; Enable winner mode to quickly restore window configurations
 (winner-mode 1)
 (global-set-key (kbd "M-s-[") 'winner-undo)
 (global-set-key (kbd "M-s-]") 'winner-redo)
