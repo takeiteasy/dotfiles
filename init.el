@@ -51,6 +51,8 @@
  'shell-pop
  'company
  'org
+ 'slime
+ 'hy-mode
  'evil)
 
 ;; Pass system shell environment to Emacs. This is important primarily for shell inside Emacs, but also things like Org mode export to Tex PDF don't work, since it relies on running external command pdflatex, which is loaded from PATH.
@@ -156,6 +158,9 @@
 
 (add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
 
+(setq display-line-numbers-type 'relative)
+(global-display-line-numbers-mode)
+
 ;; Set colors to distinguish between active and inactive windows
 (set-face-attribute 'mode-line nil :background "SlateGray1")
 (set-face-attribute 'mode-line-inactive nil :background "grey93")
@@ -183,6 +188,8 @@
 ;; Never use tabs, use spaces instead.
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
+(setq c-default-style "linux")
+(setq c-basic-offset 4)
 (setq indent-line-function 'insert-tab)
 
 ;; Show keybindings cheatsheet
@@ -374,24 +381,6 @@ point reaches the beginning or end of the buffer, stop there."
 (set-face-foreground 'git-gutter:added "green4")
 (set-face-foreground 'git-gutter:deleted "red")
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(connection-local-criteria-alist
-   '(((:application eshell)
-      eshell-connection-default-profile)))
- '(connection-local-profile-alist
-   '((eshell-connection-default-profile
-      (eshell-path-env-list))))
- '(package-selected-packages '(evil))
- '(shell-pop-shell-type
-   '("ansi-term" "*ansi-term*"
-     (lambda nil
-       (ansi-term shell-pop-term-shell))))
- '(shell-pop-universal-key "s-="))
-
 (setq company-idle-delay 0.1)
 (setq company-global-modes '(not org-mode))
 (setq company-minimum-prefix-length 1)
@@ -421,4 +410,12 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Contain custom settings to private.el to ensure easy Castlemacs updates.
 (global-set-key (kbd "C-x c") (lambda () (interactive) (find-file "~/.emacs.d/private.el")))
 
+(setq inferior-lisp-program "sbcl")
+
 (evil-mode 1)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
