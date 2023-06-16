@@ -387,15 +387,13 @@ point reaches the beginning or end of the buffer, stop there."
 (add-hook 'after-init-hook 'global-company-mode)
 
 ;; Some basic Org defaults
-(use-package org
-  :config
-  (setq org-startup-indented t)         ;; Visually indent sections. This looks better for smaller files.
-  (setq org-src-tab-acts-natively t)    ;; Tab in source blocks should act like in major mode
-  (setq org-src-preserve-indentation t)
-  (setq org-log-into-drawer t)          ;; State changes for todos and also notes should go into a Logbook drawer
-  (setq org-src-fontify-natively t)     ;; Code highlighting in code blocks
-  (setq org-log-done 'time)             ;; Add closed date when todo goes to DONE state
-  (setq org-support-shift-select t))    ;; Allow shift selection with arrows.
+(setq org-startup-indented t)         ;; Visually indent sections. This looks better for smaller files.
+(setq org-src-tab-acts-natively t)    ;; Tab in source blocks should act like in major mode
+(setq org-src-preserve-indentation t)
+(setq org-log-into-drawer t)          ;; State changes for todos and also notes should go into a Logbook drawer
+(setq org-src-fontify-natively t)     ;; Code highlighting in code blocks
+(setq org-log-done 'time)             ;; Add closed date when todo goes to DONE state
+(setq org-support-shift-select t)    ;; Allow shift selection with arrows.
 
 ;; Store all my org files in ~/org.
 (setq org-directory "~/org")
@@ -419,3 +417,10 @@ point reaches the beginning or end of the buffer, stop there."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(windmove which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens slime simpleclip shell-pop multiple-cursors move-text magit ivy-rich hy-mode git-gutter flx expand-region exec-path-from-shell evil counsel-projectile company avy all-the-icons)))
