@@ -37,7 +37,6 @@
  'which-key
  'visual-regexp
  'multiple-cursors
- 'windmove
  'ivy
  'swiper
  'counsel
@@ -50,7 +49,6 @@
  'git-gutter
  'shell-pop
  'company
- 'org
  'slime
  'hy-mode
  'evil)
