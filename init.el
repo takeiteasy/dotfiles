@@ -49,6 +49,10 @@
  'git-gutter
  'shell-pop
  'company
+ 'lsp-mode
+ 'lsp-ivy
+ 'diminish
+ 'yasnippet
  'slime
  'hy-mode
  'evil)
@@ -384,6 +388,14 @@ point reaches the beginning or end of the buffer, stop there."
 (setq company-minimum-prefix-length 1)
 (add-hook 'after-init-hook 'global-company-mode)
 
+(yas-global-mode)
+(diminish 'yas-minor-mode)
+(add-hook 'lisp-mode-hook 'lsp)
+(add-hook 'lisp-mode-hook #'lsp-deferred)
+
+(setq company-auto-complete t)
+(global-set-key (kbd "C-c C-k") 'company-complete)
+
 ;; Some basic Org defaults
 (setq org-startup-indented t)         ;; Visually indent sections. This looks better for smaller files.
 (setq org-src-tab-acts-natively t)    ;; Tab in source blocks should act like in major mode
@@ -421,4 +433,4 @@ point reaches the beginning or end of the buffer, stop there."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(windmove which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens slime simpleclip shell-pop multiple-cursors move-text magit ivy-rich hy-mode git-gutter flx expand-region exec-path-from-shell evil counsel-projectile company avy all-the-icons)))
+   '(yasnippet windmove which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens slime simpleclip shell-pop multiple-cursors move-text magit ivy-rich hy-mode git-gutter flx expand-region exec-path-from-shell evil counsel-projectile company avy all-the-icons)))

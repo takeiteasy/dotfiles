@@ -17,6 +17,7 @@ source $ZSH/oh-my-zsh.sh
 function emacs() {
     open -a "/Applications/Emacs.app/Contents/MacOS/Emacs" "$@"
 }
+alias fix-permissions="find . -type d -exec chmod -fv 755 {} \"
 alias mkdir="mkdir -p"
 alias mkd="mkdir"
 function mkcd() {
