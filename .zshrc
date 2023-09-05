@@ -1,7 +1,7 @@
 # Fig pre block. Keep at the top of this file.
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 
-MYPATH=/opt/homebrew/bin/:$HOME/.bin:$HOME/.local/bin:/usr/local/bin
+MYPATH=/opt/homebrew/bin/:$HOME/.bin:$HOME/.local/bin:/usr/local/bin:/opt/homebrew/opt/ruby/bin
 BREW_BIN="/opt/homebrew/bin/brew"
 if type "${BREW_BIN}" &> /dev/null; then
     export BREW_PREFIX="$(/opt/homebrew/bin/brew --prefix)"
@@ -10,9 +10,10 @@ if type "${BREW_BIN}" &> /dev/null; then
     for mandir in "${BREW_PREFIX}/opt/"*"/libexec/gnuman"; do export MANPATH=$mandir:$MANPATH; done
     for mandir in "${BREW_PREFIX}/opt/"*"/share/man/man1"; do export MANPATH=$mandir:$MANPATH; done
 fi
-export LDFLAGS="-L/opt/homebrew/lib -L/opt/homebrew/opt/binutils/lib -L/opt/homebrew/opt/flex/lib"
-export CFLAGS="-I/opt/homebrew/opt/include -I/opt/homebrew/opt/binutils/include -I/opt/homebrew/opt/flex/include"
-export CPPFLAGS=CFLAGS
+export LDFLAGS="-L/opt/homebrew/lib -L/opt/homebrew/opt/binutils/lib -L/opt/homebrew/opt/flex/lib -L/opt/homebrew/opt/ruby/lib"
+export CFLAGS="-I/opt/homebrew/opt/include -I/opt/homebrew/opt/binutils/include -I/opt/homebrew/opt/flex/include -I/opt/homebrew/opt/ruby/include"
+export CPPFLAGS="-std=c++11 -lstdc++"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/ruby/lib/pkgconfig"
 
 export ZSH="$HOME/.oh-my-zsh"
 DISABLE_AUTO_TITLE="true"
@@ -87,7 +88,7 @@ PROMPT=" $(prompt_context)⬥  "
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+#source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 test -e /Users/george/.iterm2_shell_integration.zsh && source /Users/george/.iterm2_shell_integration.zsh || true
 
