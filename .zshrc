@@ -12,23 +12,18 @@ if type "${BREW_BIN}" &> /dev/null; then
 fi
 export LDFLAGS="-L/opt/homebrew/lib -L/opt/homebrew/opt/binutils/lib -L/opt/homebrew/opt/flex/lib -L/opt/homebrew/opt/ruby/lib"
 export CFLAGS="-I/opt/homebrew/opt/include -I/opt/homebrew/opt/binutils/include -I/opt/homebrew/opt/flex/include -I/opt/homebrew/opt/ruby/include"
-export CPPFLAGS="-std=c++11 -lstdc++"
 export PKG_CONFIG_PATH="/opt/homebrew/opt/ruby/lib/pkgconfig"
 
 export ZSH="$HOME/.oh-my-zsh"
-DISABLE_AUTO_TITLE="true"
+plugins=(alias-finder asdf autojump command-not-found colored-man-pages extract fig zsh-interactive-cd zsh-navigation-tools bgnotify copybuffer extract jump thefuck vi-mode history-substring-search)
+source $ZSH/oh-my-zsh.sh
 DISABLE_AUTO_TITLE="true"
 # CASE_SENSITIVE="true"
 # HYPHEN_INSENSITIVE="true"
 # DISABLE_MAGIC_FUNCTIONS="true"
 ENABLE_CORRECTION="true"
 COMPLETION_WAITING_DOTS="true"
-plugins=(alias-finder asdf autojump command-not-found colored-man-pages extract fig zsh-interactive-cd zsh-navigation-tools bgnotify copybuffer extract jump thefuck vi-mode history-substring-search)
-source $ZSH/oh-my-zsh.sh
 
-function emacs() {
-    open -a "/Applications/Emacs.app/Contents/MacOS/Emacs" "$@"
-}
 alias mkdir="mkdir -p"
 alias mkd="mkdir"
 function mkcd() {
@@ -46,7 +41,7 @@ function cl-eval() {
     sbcl --quit --eval "$@"
 }
 
-function cl-brew() {
+function quickload() {
     cmd=""
     for arg in "$@"
     do
@@ -55,36 +50,7 @@ function cl-brew() {
     cl-eval "(mapc #'ql:quickload '($cmd))"
 }
 
-function git_branch_name() {
-    branch=$(git symbolic-ref HEAD 2> /dev/null | awk 'BEGIN{FS="/"} {print $NF}')
-    if [[ -n $branch ]]; then
-        echo -ne ' - ('$branch
-        if test -z "$(git status --porcelain --ignore-submodules)"; then
-            echo -n '±'
-        fi
-        echo ')'
-    fi
-}
-function tab_title() {
-    # sets the tab title to current dir
-    if [ $(git rev-parse --is-inside-work-tree 2>/dev/null) ]; then
-        if [[ $(git diff --stat) != '' ]]; then
-            echo -ne "\e]1;👍🏻\a"
-        else
-            echo -ne "\e]1;✍🏻\a"
-        fi
-    fi
-    # echo -ne "\e]1;${PWD/#$HOME/~}$(git_branch_name)\a"
-}
-add-zsh-hook precmd tab_title
-prompt_context() {
-    if [[ `whoami` != "george" || -n "$SSH_CONNECTION" ]]; then
-        print -n "%{%F{red}%}"
-    else
-        print -n "%{%F{white}%}"
-    fi
-}
-PROMPT=" $(prompt_context)⬥  "
+PS1=" ⬥  "
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
@@ -94,3 +60,9 @@ test -e /Users/george/.iterm2_shell_integration.zsh && source /Users/george/.ite
 
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
+
+PATH="/Users/george/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/Users/george/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/Users/george/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/Users/george/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/Users/george/perl5"; export PERL_MM_OPT;
