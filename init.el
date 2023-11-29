@@ -140,16 +140,35 @@
   (set-face-attribute 'default nil :font "Menlo 15"))
 (setq-default line-spacing 2)
 
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
 ;; Nice and simple default light theme.
-(defun my/apply-theme (appearance)
+ (defun my/apply-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
-  (mapc #'disable-theme custom-enabled-themes)
-  (pcase appearance
-    ('light (load-theme 'tsdh-light t))
-    ('dark (load-theme 'tsdh-dark t))))
+   (mapc #'disable-theme custom-enabled-themes)
+   (pcase appearance
+     ('light (load-theme 'almost-mono-white t))
+     ('dark (load-theme 'almost-mono-black t))))
 
-(add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
+ (add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
+
+(use-package almost-mono-themes)
+
+(use-package rainbow-mode)
+
+(defun rainbow-mode-hook ()
+  (rainbow-mode 1))
+(add-hook 'prog-mode-hook 'rainbow-mode-hook)
+
+(use-package rainbow-delimiters)
+
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+
+(use-package highlight-parentheses
+  :ensure t)
+
+(add-hook 'prog-mode-hook #'highlight-parentheses-mode)
+(add-hook 'minibuffer-setup-hook #'highlight-parentheses-minibuffer-setup)
 
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode)
@@ -179,7 +198,6 @@
   (require 'smartparens-config)
   (smartparens-global-mode t)
   (show-smartparens-global-mode t))
-
 
 ;; Hide minor modes from modeline
 (use-package rich-minority
@@ -329,7 +347,11 @@ point reaches the beginning or end of the buffer, stop there."
 ;; no vim insert bindings
   (setq evil-undo-system 'undo-fu)
 :config
-  (evil-mode 1))
+(evil-mode 1))
+
+(use-package evil-easymotion
+  :config
+  (evilem-default-keybindings "SPC"))
 
 ;; Expand-region allows to gradually expand selection inside words, sentences, expressions, etc.
 (use-package expand-region
@@ -533,6 +555,7 @@ point reaches the beginning or end of the buffer, stop there."
   (setq company-minimum-prefix-length 1)
   (add-hook 'after-init-hook 'global-company-mode))
 
+(use-package hy-mode)
 
 ;; ===========================
 ;; SPELLCHECKING AND THESAURUS
@@ -610,8 +633,10 @@ point reaches the beginning or end of the buffer, stop there."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae" "cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4" default))
  '(package-selected-packages
-   '(slime which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens simpleclip shell-pop rich-minority powerthesaurus neotree multiple-cursors move-text magit ivy-rich git-gutter flyspell-correct-popup flx expand-region exec-path-from-shell evil define-word counsel-projectile company avy all-the-icons))
+   '(evil-easymotion evil-smartparens rainbow-delimiters rainbow-delimiter rainbow-delimiter-mode rainbow-mode slime which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens simpleclip shell-pop rich-minority powerthesaurus neotree multiple-cursors move-text magit ivy-rich git-gutter flyspell-correct-popup flx expand-region exec-path-from-shell evil define-word counsel-projectile company avy all-the-icons))
  '(shell-pop-shell-type
    '("ansi-term" "*ansi-term*"
      (lambda nil

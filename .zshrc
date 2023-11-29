@@ -1,6 +1,5 @@
 # Fig pre block. Keep at the top of this file.
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
-
 MYPATH=/opt/homebrew/bin/:$HOME/.bin:$HOME/.local/bin:/usr/local/bin:/opt/homebrew/opt/ruby/bin
 BREW_BIN="/opt/homebrew/bin/brew"
 if type "${BREW_BIN}" &> /dev/null; then
@@ -34,10 +33,8 @@ function mkg() {
     mkcd $1
     git init .
 }
-alias bake="bear -- make"
-alias cl="rlwrap sbcl"
 
-function cl-eval() {
+function sbcl-eval() {
     sbcl --quit --eval "$@"
 }
 
@@ -47,22 +44,28 @@ function quickload() {
     do
         cmd="$cmd :$arg"
     done
-    cl-eval "(mapc #'ql:quickload '($cmd))"
+    sbcl-eval "(mapc #'ql:quickload '($cmd))"
+}
+
+alias bake="bear -- make"
+
+function emacs () {
+    /Applications/Emacs.app/Contents/MacOS/Emacs "$@" &
 }
 
 PS1=" ⬥  "
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /opt/homebrew/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-#source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# source /opt/homebrew/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 test -e /Users/george/.iterm2_shell_integration.zsh && source /Users/george/.iterm2_shell_integration.zsh || true
-
-# Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
 
 PATH="/Users/george/perl5/bin${PATH:+:${PATH}}"; export PATH;
 PERL5LIB="/Users/george/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
 PERL_LOCAL_LIB_ROOT="/Users/george/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
 PERL_MB_OPT="--install_base \"/Users/george/perl5\""; export PERL_MB_OPT;
 PERL_MM_OPT="INSTALL_BASE=/Users/george/perl5"; export PERL_MM_OPT;
+
+# Fig post block. Keep at the bottom of this file.
+[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
