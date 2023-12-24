@@ -555,8 +555,53 @@ point reaches the beginning or end of the buffer, stop there."
   (setq company-minimum-prefix-length 1)
   (add-hook 'after-init-hook 'global-company-mode))
 
+(use-package company-c-headers
+  :config
+  (add-to-list 'company-backends 'company-c-headers))
+
 (use-package hy-mode)
 
+(use-package robe
+  :config
+  (add-hook 'ruby-mode-hook 'robe-mode)
+  (add-hook 'ruby-ts-mode-hook 'robe-mode)
+  (push 'company-robe company-backends)
+  (add-hook 'robe-mode-hook 'ac-robe-setup))
+
+(use-package inf-ruby
+  :config
+  (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+  (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+  (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter-and-focus))
+
+(add-to-list 'load-path "~/.emacs.d/packages")
+
+(use-package comment-tags
+  :config
+  (setq comment-tags-keymap-prefix (kbd "C-c t"))
+  (with-eval-after-load "comment-tags"
+    (setq comment-tags-keyword-faces
+          `(("TODO" . ,(list :weight 'bold :foreground "#28ABE3"))
+            ("FIXME" . ,(list :weight 'bold :foreground "#DB3340"))
+            ("BUG" . ,(list :weight 'bold :foreground "#DB3340"))
+            ("HACK" . ,(list :weight 'bold :foreground "#E8B71A"))
+            ("NOTE" . ,(list :weight 'bold :foreground "#F7EAC8"))
+            ("INFO" . ,(list :weight 'bold :foreground "#F7EAC8"))
+            ("DONE" . ,(list :weight 'bold :foreground "#1FDA9A"))))
+    (setq comment-tags-comment-start-only t
+          comment-tags-require-colon t
+          comment-tags-case-sensitive t
+          comment-tags-show-faces t
+          comment-tags-lighter nil))
+  (add-hook 'prog-mode-hook 'comment-tags-mode))
+
+(use-package yaml-mode
+  :config
+  (add-hook 'yaml-mode-hook
+      '(lambda ()
+        (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+
+:warn-unless-encrypted
 ;; ===========================
 ;; SPELLCHECKING AND THESAURUS
 
@@ -636,7 +681,7 @@ point reaches the beginning or end of the buffer, stop there."
  '(custom-safe-themes
    '("8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae" "cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4" default))
  '(package-selected-packages
-   '(evil-easymotion evil-smartparens rainbow-delimiters rainbow-delimiter rainbow-delimiter-mode rainbow-mode slime which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens simpleclip shell-pop rich-minority powerthesaurus neotree multiple-cursors move-text magit ivy-rich git-gutter flyspell-correct-popup flx expand-region exec-path-from-shell evil define-word counsel-projectile company avy all-the-icons))
+   '(company-irony irony company-c-headers yaml-mode evil-easymotion evil-smartparens rainbow-delimiters rainbow-delimiter rainbow-delimiter-mode rainbow-mode slime which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens simpleclip shell-pop rich-minority powerthesaurus neotree multiple-cursors move-text magit ivy-rich git-gutter flyspell-correct-popup flx expand-region exec-path-from-shell evil define-word counsel-projectile company avy all-the-icons))
  '(shell-pop-shell-type
    '("ansi-term" "*ansi-term*"
      (lambda nil
