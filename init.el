@@ -547,19 +547,30 @@ point reaches the beginning or end of the buffer, stop there."
 ;; ===============
 ;; CODE COMPLETION
 
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t))
 
 (use-package company
+  :after lsp-mode
+  :hook (prog-mode . company-mode)
+  :bind (:map company-active-map
+              ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0)
+  (company-global-modes '(not org-mode))
   :config
-  (setq company-idle-delay 0.1)
-  (setq company-global-modes '(not org-mode))
-  (setq company-minimum-prefix-length 1)
   (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package company-c-headers
   :config
   (add-to-list 'company-backends 'company-c-headers))
-
-(use-package hy-mode)
 
 (use-package robe
   :config
@@ -679,13 +690,24 @@ point reaches the beginning or end of the buffer, stop there."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae" "cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4" default))
+   '("8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae"
+     "cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2"
+     "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4"
+     default))
  '(package-selected-packages
-   '(company-irony irony company-c-headers yaml-mode evil-easymotion evil-smartparens rainbow-delimiters rainbow-delimiter rainbow-delimiter-mode rainbow-mode slime which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens simpleclip shell-pop rich-minority powerthesaurus neotree multiple-cursors move-text magit ivy-rich git-gutter flyspell-correct-popup flx expand-region exec-path-from-shell evil define-word counsel-projectile company avy all-the-icons))
+   '(all-the-icons avy company company-c-headers company-irony
+                   counsel-projectile define-word evil evil-easymotion
+                   evil-smartparens exec-path-from-shell expand-region
+                   flx flyspell-correct-popup git-gutter irony
+                   ivy-rich lsp-mode magit move-text multiple-cursors
+                   neotree powerthesaurus rainbow-delimiter
+                   rainbow-delimiter-mode rainbow-delimiters
+                   rainbow-mode rich-minority shell-pop simpleclip
+                   slime smartparens smex undo-fu vi-tilde-fringe
+                   visual-regexp which-key yaml-mode))
  '(shell-pop-shell-type
    '("ansi-term" "*ansi-term*"
-     (lambda nil
-       (ansi-term shell-pop-term-shell))))
+     (lambda nil (ansi-term shell-pop-term-shell))))
  '(shell-pop-universal-key "s-="))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
