@@ -1,14 +1,14 @@
 (require 'package)
 
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                 (not (gnutls-available-p))))
-    (proto (if no-ssl "http" "https")))
-    ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-    (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-    ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-    (when (< emacs-major-version 24)
+                    (not (gnutls-available-p))))
+       (proto (if no-ssl "http" "https")))
+  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+  (when (< emacs-major-version 24)
     ;; For important compatibility libraries like cl-lib
-(add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
+    (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
 
 (package-initialize)
 
@@ -53,10 +53,10 @@
 
 ;; Smoother and nicer scrolling
 (setq scroll-margin 10
-   scroll-step 1
-   next-line-add-newlines nil
-   scroll-conservatively 10000
-   scroll-preserve-screen-position 1)
+      scroll-step 1
+      next-line-add-newlines nil
+      scroll-conservatively 10000
+      scroll-preserve-screen-position 1)
 
 (setq mouse-wheel-follow-mouse 't)
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
@@ -93,7 +93,7 @@
  sentence-end-double-space nil     ; Sentences should end in one space, come on!
  confirm-kill-emacs 'y-or-n-p      ; y and n instead of yes and no when quitting
  help-window-select t              ; Select help window so it's easy to quit it with 'q'
-)
+ )
 
 (fset 'yes-or-no-p 'y-or-n-p)      ; y and n instead of yes and no everywhere else
 (delete-selection-mode 1)          ; Delete selected text when typing
@@ -143,14 +143,14 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 
 ;; Nice and simple default light theme.
- (defun my/apply-theme (appearance)
+(defun my/apply-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
-   (mapc #'disable-theme custom-enabled-themes)
-   (pcase appearance
-     ('light (load-theme 'almost-mono-white t))
-     ('dark (load-theme 'almost-mono-black t))))
+  (mapc #'disable-theme custom-enabled-themes)
+  (pcase appearance
+    ('light (load-theme 'almost-mono-white t))
+    ('dark (load-theme 'almost-mono-black t))))
 
- (add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
+(add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
 
 (use-package almost-mono-themes)
 
@@ -319,12 +319,12 @@ point reaches the beginning or end of the buffer, stop there."
 (defun unpop-to-mark-command ()
   "Unpop off mark ring. Does nothing if mark ring is empty."
   (interactive)
-      (when mark-ring
-        (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
-        (set-marker (mark-marker) (car (last mark-ring)) (current-buffer))
-        (when (null (mark t)) (ding))
-        (setq mark-ring (nbutlast mark-ring))
-        (goto-char (marker-position (car (last mark-ring))))))
+  (when mark-ring
+    (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
+    (set-marker (mark-marker) (car (last mark-ring)) (current-buffer))
+    (when (null (mark t)) (ding))
+    (setq mark-ring (nbutlast mark-ring))
+    (goto-char (marker-position (car (last mark-ring))))))
 
 (global-set-key (kbd "s-,") 'my-pop-local-mark-ring)
 (global-set-key (kbd "s-.") 'unpop-to-mark-command)
@@ -338,16 +338,16 @@ point reaches the beginning or end of the buffer, stop there."
 ;; TEXT EDITING
 
 (use-package evil
-:demand t
-:bind (("<escape>" . keyboard-escape-quit))
-:init
-;; allows for using cgn
-;; (setq evil-search-module 'evil-search)
+  :demand t
+  :bind (("<escape>" . keyboard-escape-quit))
+  :init
+  ;; allows for using cgn
+  ;; (setq evil-search-module 'evil-search)
   (setq evil-want-keybinding nil)
-;; no vim insert bindings
+  ;; no vim insert bindings
   (setq evil-undo-system 'undo-fu)
-:config
-(evil-mode 1))
+  :config
+  (evil-mode 1))
 
 (use-package evil-easymotion
   :config
@@ -466,8 +466,8 @@ point reaches the beginning or end of the buffer, stop there."
   (setq enable-recursive-minibuffers t)
 
   (setq ivy-re-builders-alist
-      '((swiper . ivy--regex-plus)
-        (t      . ivy--regex-fuzzy)))   ;; enable fuzzy searching everywhere except for Swiper
+        '((swiper . ivy--regex-plus)
+          (t      . ivy--regex-fuzzy)))   ;; enable fuzzy searching everywhere except for Swiper
 
   (global-set-key (kbd "s-b") 'ivy-switch-buffer)  ;; Cmd+b show buffers and recent files
   (global-set-key (kbd "M-s-b") 'ivy-resume))      ;; Alt+Cmd+b resume whatever Ivy was doing
@@ -547,34 +547,12 @@ point reaches the beginning or end of the buffer, stop there."
 ;; ===============
 ;; CODE COMPLETION
 
-
 (use-package company
   :config
   (setq company-idle-delay 0.1)
   (setq company-global-modes '(not org-mode))
   (setq company-minimum-prefix-length 1)
   (add-hook 'after-init-hook 'global-company-mode))
-
-(use-package company-c-headers
-  :config
-  (add-to-list 'company-backends 'company-c-headers))
-
-(use-package hy-mode)
-
-(use-package robe
-  :config
-  (add-hook 'ruby-mode-hook 'robe-mode)
-  (add-hook 'ruby-ts-mode-hook 'robe-mode)
-  (push 'company-robe company-backends)
-  (add-hook 'robe-mode-hook 'ac-robe-setup))
-
-(use-package inf-ruby
-  :config
-  (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
-  (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
-  (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter-and-focus))
-
-(add-to-list 'load-path "~/.emacs.d/packages")
 
 (use-package comment-tags
   :config
@@ -595,13 +573,6 @@ point reaches the beginning or end of the buffer, stop there."
           comment-tags-lighter nil))
   (add-hook 'prog-mode-hook 'comment-tags-mode))
 
-(use-package yaml-mode
-  :config
-  (add-hook 'yaml-mode-hook
-      '(lambda ()
-        (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
-
-:warn-unless-encrypted
 ;; ===========================
 ;; SPELLCHECKING AND THESAURUS
 
@@ -679,13 +650,24 @@ point reaches the beginning or end of the buffer, stop there."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae" "cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2" "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4" default))
+   '("8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae"
+     "cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2"
+     "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4"
+     default))
  '(package-selected-packages
-   '(company-irony irony company-c-headers yaml-mode evil-easymotion evil-smartparens rainbow-delimiters rainbow-delimiter rainbow-delimiter-mode rainbow-mode slime which-key visual-regexp vi-tilde-fringe undo-fu smex smartparens simpleclip shell-pop rich-minority powerthesaurus neotree multiple-cursors move-text magit ivy-rich git-gutter flyspell-correct-popup flx expand-region exec-path-from-shell evil define-word counsel-projectile company avy all-the-icons))
+   '(all-the-icons avy company company-c-headers company-irony
+                   counsel-projectile define-word evil evil-easymotion
+                   evil-smartparens exec-path-from-shell expand-region
+                   flx flyspell-correct-popup git-gutter irony
+                   ivy-rich lsp-mode magit move-text multiple-cursors
+                   neotree powerthesaurus rainbow-delimiter
+                   rainbow-delimiter-mode rainbow-delimiters
+                   rainbow-mode rich-minority shell-pop simpleclip
+                   slime smartparens smex undo-fu vi-tilde-fringe
+                   visual-regexp which-key yaml-mode))
  '(shell-pop-shell-type
    '("ansi-term" "*ansi-term*"
-     (lambda nil
-       (ansi-term shell-pop-term-shell))))
+     (lambda nil (ansi-term shell-pop-term-shell))))
  '(shell-pop-universal-key "s-="))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
