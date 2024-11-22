@@ -1,4 +1,11 @@
 set fish_greeting
+set -Ux OS Darwin
+set -p PATH $HOME/.local/bin $HOME/.qlot/bin
+
+alias bake="bear -- make"
+alias xcodebuild="xcodebuild -arch arm64"
+alias sbcl="rlwrap sbcl"
+alias love="/Applications/love.app/Contents/MacOS/love"
 
 function fish_prompt
     echo ' ⬥  '
