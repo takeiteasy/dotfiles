@@ -1,6 +1,7 @@
 set fish_greeting
 set -Ux OS Darwin
 set -p PATH $HOME/.local/bin $HOME/.qlot/bin
+set DOCKER_HOST "unix://$HOME/.colima/docker.sock"
 
 alias bake="bear -- make"
 alias xcodebuild="xcodebuild -arch arm64"
