@@ -1,8 +1,9 @@
 set fish_greeting
 set -Ux OS Darwin
-set -p PATH $HOME/.local/bin $HOME/.qlot/bin
+set -p PATH $HOME/.local/bin $HOME/.qlot/bin /opt/homebrew/opt/llvm/bin 
 set DOCKER_HOST "unix://$HOME/.colima/docker.sock"
 
+alias vim="nvim"
 alias bake="bear -- make"
 alias xcodebuild="xcodebuild -arch arm64"
 alias sbcl="rlwrap sbcl"
@@ -26,3 +27,12 @@ if status is-interactive
     [ -f /opt/homebrew/share/autojump/autojump.fish ]; and source /opt/homebrew/share/autojump/autojump.fish
     source /opt/homebrew/opt/asdf/libexec/asdf.fish
 end
+
+
+# BEGIN opam configuration
+# This is useful if you're using opam as it adds:
+#   - the correct directories to the PATH
+#   - auto-completion for the opam binary
+# This section can be safely removed at any time if needed.
+test -r '/Users/george/.opam/opam-init/init.fish' && source '/Users/george/.opam/opam-init/init.fish' > /dev/null 2> /dev/null; or true
+# END opam configuration

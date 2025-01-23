@@ -1,10 +1,8 @@
-set shell=/usr/bin/local/zsh
+set shell=/opt/homebrew/bin/fish
 set nocompatible
 filetype off
 
 call plug#begin()
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'tweekmonster/deoplete-clang2'
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'easymotion/vim-easymotion'
@@ -22,10 +20,13 @@ Plug 'godlygeek/tabular'
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/nerdtree'
 Plug 'lfilho/cosco.vim'
-Plug 'takeiteasy/vim-monochrome'
-Plug 'rhysd/vim-crystal'
-Plug 'sentientmachine/Pretty-Vim-Python'
 Plug 'vim-scripts/colorizer'
+
+Plug 'hylang/vim-hy'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
 call plug#end()
 
 syntax enable
@@ -36,7 +37,7 @@ filetype plugin on
 
 set t_Co=256
 set background=dark
-color monochrome
+" color monochrome
 
 let mapleader=","
 
@@ -120,16 +121,6 @@ noremap <silent> <C-S> :update<CR>
 vnoremap <silent> <C-S> <C-C>:update<CR>
 inoremap <silent> <C-S> <C-O>:update<CR>
 
-let g:deoplete#enable_at_startup=1
-function g:Multiple_cursors_before()
-	let g:deoplete#disable_auto_complete = 1
-endfunction
-function g:Multiple_cursors_after()
-	let g:deoplete#disable_auto_complete = 0
-endfunction
-
-let g:deoplete#sources#clang#executable = '/usr/bin/clang'
-
 let s:base03  = [ '#242424', 235 ]
 let s:base023 = [ '#353535 ', 236 ]
 let s:base02  = [ '#444444 ', 238 ]
@@ -164,7 +155,7 @@ let s:p.tabline.right   = [ [ s:base2, s:base00 ] ]
 let s:p.normal.error    = [ [ s:base03, s:red ] ]
 let s:p.normal.warning  = [ [ s:base023, s:yellow ] ]
 
-let g:lightline#colorscheme#monochromell#palette = lightline#colorscheme#flatten(s:p)
+" let g:lightline#colorscheme#monochromell#palette = lightline#colorscheme#flatten(s:p)
 
 let g:rainbow#max_level = 16
 let g:rainbow#pairs = [['(', ')'], ['[', ']'], ['<', '>'], ['{', '}']]
@@ -181,8 +172,8 @@ let g:rainbow#colors = {
 autocmd VimEnter * RainbowParentheses
 
 set laststatus=2
+" \	'colorscheme': 'monochromell',
 let g:lightline = {
-\	'colorscheme': 'monochromell',
 \ 	'mode_map': {
 \		'n':			' N ',
 \		'i':			' I ',
@@ -268,5 +259,4 @@ let g:NERDTrimTrailingWhitespace=1
 autocmd FileType javascript,css,cpp,c nmap <silent> <Leader>; <Plug>(cosco-commaOrSemiColon)
 autocmd FileType javascript,css,cpp,c imap <silent> <Leader>; <c-o><Plug>(cosco-commaOrSemiColon)
 
-let g:python2_host_prog = '/usr/local/bin/python'
-let g:python3_host_prog = '/usr/local/bin/python3'
+let g:python3_host_prog = '/opt/homebrew/bin/python3'
