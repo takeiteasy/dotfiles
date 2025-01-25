@@ -264,3 +264,4 @@ autocmd FileType javascript,css,cpp,c nmap <silent> <Leader>; <Plug>(cosco-comma
 autocmd FileType javascript,css,cpp,c imap <silent> <Leader>; <c-o><Plug>(cosco-commaOrSemiColon)
 
 let g:python3_host_prog = '/opt/homebrew/bin/python3'
+

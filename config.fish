@@ -9,18 +9,46 @@ alias xcodebuild="xcodebuild -arch arm64"
 alias sbcl="rlwrap sbcl"
 alias love="/Applications/love.app/Contents/MacOS/love"
 
-function fish_prompt
-    echo ' ⬥  '
+function fish_user_key_bindings
+    fish_default_key_bindings -M insert
+    fish_vi_key_bindings --no-erase insert
 end
 
-function fish_right_prompt
+function fish_mode_prompt
+    switch $fish_bind_mode
+        case default
+            set_color --bold red
+            echo 'N'
+        case insert
+            set_color --bold green
+            echo 'I'
+        case replace_one
+            set_color --bold yellow
+            echo 'R'
+        case visual
+            set_color --bold brmagenta
+            echo 'V'
+        case '*'
+            set_color --bold red
+            echo '?'
+    end
+    set_color normal
+end
+
+function fish_prompt
     set -l last_status $status
     # Prompt status only if it's not 0
     set -l stat
     if test $last_status -ne 0
-        set stat (set_color red)"[$last_status]"(set_color normal)
+        set stat (set_color --bold red)' ⬥  '(set_color normal)
+    else
+        set stat ' ⬥  '
     end
-    echo $stat
+    echo "$stat"
+end
+
+function fish_right_prompt
+    echo (string split '/' (prompt_pwd --full-length-dirs=1 --dir-length=1) | tac | string join '/')
 end
 
 if status is-interactive
