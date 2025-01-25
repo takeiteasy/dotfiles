@@ -314,10 +314,10 @@ Lisp function does not specify a special indentation."
           (lambda () (setq-local lisp-indent-function #'Fuco1/lisp-indent-function)))
 
 ;; Never use tabs, use spaces instead.
-(setq indent-tabs-mode nil) ; Use spaces for indentation
-(setq tab-width 2) ; Set tab width to 2 spaces
+(setq-default indent-tabs-mode nil) ; Use spaces for indentation
+(setq tab-width 4) ; Set tab width to 2 spaces
 (setq c-basic-offset 4)
-(setq-default c-basic-indent 2)
+(setq-default c-basic-indent 4)
 
 ;; Show keybindings cheatsheet
 (use-package which-key

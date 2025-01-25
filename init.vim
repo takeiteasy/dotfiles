@@ -60,15 +60,18 @@ set foldenable
 set foldlevelstart=99
 set foldmethod=marker
 set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
-set foldcolumn=2
-set tabstop=2
-set softtabstop=2
-set shiftwidth=2
+set foldcolumn=4
+set autoindent
+set copyindent
+set preserveindent
+set indentexpr=
+set softtabstop=0
+set shiftwidth=4
+set tabstop=4
+set expandtab | retab
 set shiftround
 set smarttab
 set backspace=indent,eol,start
-set autoindent
-set copyindent
 set ignorecase
 set smartcase
 set virtualedit=
@@ -90,6 +93,7 @@ set nobackup
 set noswapfile
 set directory=~/.config/nvim/.tmp,~/tmp,/tmp
 set viminfo='20,\"80
+set relativenumber
 
 function! NumberToggle()
 	if(&relativenumber == 1)

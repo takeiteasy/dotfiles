@@ -28,6 +28,7 @@ if status is-interactive
     source /opt/homebrew/opt/asdf/libexec/asdf.fish
 end
 
+pyenv init - fish | source
 
 # BEGIN opam configuration
 # This is useful if you're using opam as it adds:
