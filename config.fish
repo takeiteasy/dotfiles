@@ -1,7 +1,8 @@
 set fish_greeting
 set -Ux OS Darwin
-set -p PATH $HOME/.local/bin $HOME/.qlot/bin /opt/homebrew/opt/llvm/bin 
+set -p PATH /opt/homebrew/bin $HOME/.local/bin $HOME/.qlot/bin /opt/homebrew/opt/llvm/bin $HOME/.qlot/bin 
 set DOCKER_HOST "unix://$HOME/.colima/docker.sock"
+set OLLAMA_ORIGINS "*"
 
 alias vim="nvim"
 alias bake="bear -- make"
@@ -48,7 +49,7 @@ function fish_prompt
 end
 
 function fish_right_prompt
-    echo (string split '/' (prompt_pwd --full-length-dirs=1 --dir-length=1) | tac | string join '/')
+    echo (string split '/' (prompt_pwd --full-length-dirs=1 --dir-length=1) | /opt/homebrew/opt/coreutils/libexec/gnubin/tac | string join '/')
 end
 
 if status is-interactive
@@ -57,11 +58,4 @@ if status is-interactive
 end
 
 pyenv init - fish | source
-
-# BEGIN opam configuration
-# This is useful if you're using opam as it adds:
-#   - the correct directories to the PATH
-#   - auto-completion for the opam binary
-# This section can be safely removed at any time if needed.
-test -r '/Users/george/.opam/opam-init/init.fish' && source '/Users/george/.opam/opam-init/init.fish' > /dev/null 2> /dev/null; or true
-# END opam configuration
+rvm default

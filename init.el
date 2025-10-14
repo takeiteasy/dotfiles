@@ -1,109 +1,203 @@
-(require 'package)
+;; -*- lexical-binding: t; -*-
 
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
+(setq package-enable-at-startup nil)
 
-(package-initialize)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-;; We will use 'use-package' to install and configure packages.
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(eval-when-compile (require 'use-package))
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+(setq use-package-always-defer t)
 
-;; No need to out 'ensure' everywhere, since we don't use anything else to install packages.
-(setq use-package-always-ensure t)
+;; Open config file by pressing C-x and then C
+(global-set-key (kbd "C-x C")
+                (lambda ()
+                  (interactive)
+                  (find-file "~/.emacs")))
 
-(use-package exec-path-from-shell
-  :ensure t)
+(global-set-key (kbd "C-x C-e")
+                (lambda ()
+                  (interactive)
+                  (load-file "~/.emacs")))
+
+;; Enable transparent title bar on macOS
 (when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize))
+  (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
-(setq inferior-lisp-program "sbcl")
-(use-package slime
-  :ensure t)
+(use-package emacs
+  :init
+  ;; Font
+  (if (facep 'mode-line-active)
+      (set-face-attribute 'mode-line-active nil :family "Noto Sans" :height 100) ; For 29+
+    (set-face-attribute 'mode-line nil :family "Noto Sans" :height 100))
+  (set-face-attribute 'mode-line-inactive nil :family "Noto Sans" :height 100)
+  ;; UTF-8
+  (set-charset-priority 'unicode)
+  (setq locale-coding-system 'utf-8
+        coding-system-for-read 'utf-8
+        coding-system-for-write 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+  ;; Tabs
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  ;; Relative line numbers
+  (defun ab/enable-line-numbers ()
+    "Enable relative line numbers"
+    (interactive)
+    (display-line-numbers-mode)
+    (setq display-line-numbers 'relative))
+  (add-hook 'prog-mode-hook #'ab/enable-line-numbers)
+  ;; Mac keys
+  (when (eq system-type 'darwin)
+    (setq mac-right-command-modifier 'super)
+    (setq mac-command-modifier 'super)
+    (setq mac-option-modifier 'meta)
+    (setq mac-right-option-modifier 'nil))
+  ;; Other stuff
+  (setq-default frame-title-format "%b (%f)")
+  (setq
+   inhibit-startup-message t         ; Don't show the startup message...
+   inhibit-startup-screen t          ; ... or screen
+   cursor-in-non-selected-windows t  ; Hide the cursor in inactive windows
+   echo-keystrokes 0.1               ; Show keystrokes right away, don't show the message in the scratch buffer
+   initial-scratch-message nil       ; Empty scratch buffer
+   initial-major-mode 'org-mode      ; Org mode by default
+   sentence-end-double-space nil     ; Sentences should end in one space, come on!
+   confirm-kill-emacs 'y-or-n-p      ; y and n instead of yes and no when quitting
+   help-window-select t              ; Select help window so it's easy to quit it with 'q'
+   )
+  (fset 'yes-or-no-p 'y-or-n-p)      ; y and n instead of yes and no everywhere else
+  (delete-selection-mode 1)          ; Delete selected text when typing
+  (global-unset-key (kbd "s-p"))     ; Don't print
+  )
 
-;; =============
-;; MODIFIER KEYS
+(tool-bar-mode -1)             ; Hide the outdated icons
+(scroll-bar-mode -1)           ; Hide the always-visible scrollbar
+(setq inhibit-splash-screen t) ; Remove the "Welcome to GNU Emacs" splash screen
+(setq use-file-dialog nil)      ; Ask for textual confirmation instead of GUI
+(setq find-file-visit-truename t)
+(setq-default delete-by-moving-to-trash t) ;; Move to trash
+(global-auto-revert-mode t) ;; Update buffers when file changes
+(global-hl-line-mode 1) ;; Highlight current line
 
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
 
-;; Both command keys are 'Super'
-(setq mac-right-command-modifier 'super)
-(setq mac-command-modifier 'super)
+(use-package vterm
+    :ensure t)
 
+(setq vterm-eval-cmds '(("find-file" find-file)
+                        ("message" message)
+                        ("vterm-clear-scrollback" vterm-clear-scrollback)
+                        ("dired" dired)
+                        ("ediff-files" ediff-files)))
 
-;; Option or Alt is naturally 'Meta'
-(setq mac-option-modifier 'meta)
+(use-package evil
+  :demand ; No lazy loading
+  :bind (("<escape>" . keyboard-escape-quit))
+  :config
+  (setq evil-undo-system 'undo-fu)
+  (setq evil-search-module 'evil-search)
+  :init
+  (evil-mode 1))
 
+(use-package evil-nerd-commenter
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
-;; Right Alt (option) can be used to enter symbols like em dashes '—' and euros '€' and stuff.
-(setq mac-right-option-modifier 'nil)
+(use-package doom-themes
+  :demand
+  :config
+  (load-theme 'doom-challenger-deep t))
 
+(use-package doom-modeline
+  :ensure t
+  :init
+  (doom-modeline-mode 1))
 
-;; =============
-;; SANE DEFAULTS
+(use-package nerd-icons)
 
-
-;; Smoother and nicer scrolling
-(setq scroll-margin 10
-      scroll-step 1
-      next-line-add-newlines nil
-      scroll-conservatively 10000
-      scroll-preserve-screen-position 1)
-
-(setq mouse-wheel-follow-mouse 't)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-
-
-;; Use ESC as universal get me out of here command
-(define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-
-
-;; Don't bother with auto save and backups.
-(setq auto-save-default nil)
-(setq make-backup-files nil)
-
-
-;; Warn only when opening files bigger than 100MB
-(setq large-file-warning-threshold 100000000)
-
-
-;; Move file to trash instead of removing.
-(setq-default delete-by-moving-to-trash t)
-
-
-;; Revert (update) buffers automatically when underlying files are changed externally.
-(global-auto-revert-mode t)
-
-(setq
- inhibit-startup-message t         ; Don't show the startup message...
- inhibit-startup-screen t          ; ... or screen
- cursor-in-non-selected-windows t  ; Hide the cursor in inactive windows
-
- echo-keystrokes 0.1               ; Show keystrokes right away, don't show the message in the scratch buffer
- initial-scratch-message nil       ; Empty scratch buffer
- initial-major-mode 'org-mode      ; Org mode by default
- sentence-end-double-space nil     ; Sentences should end in one space, come on!
- confirm-kill-emacs 'y-or-n-p      ; y and n instead of yes and no when quitting
- help-window-select t              ; Select help window so it's easy to quit it with 'q'
- )
-
-(fset 'yes-or-no-p 'y-or-n-p)      ; y and n instead of yes and no everywhere else
-(delete-selection-mode 1)          ; Delete selected text when typing
-(global-unset-key (kbd "s-p"))     ; Don't print
-
-
-;; We need Emacs kill ring and system clipboard to be independent. Simpleclip is the solution to that.
 (use-package simpleclip
   :config
   (simpleclip-mode 1))
+
+(use-package nyan-mode
+  :init
+  (nyan-mode))
+
+;; Use minimalist Ivy for most things.
+(use-package ivy
+  :diminish                             ;; don't show Ivy in minor mode list
+  :config
+  (ivy-mode 1)                          ;; enable Ivy everywhere
+  (setq ivy-use-virtual-buffers t)      ;; show bookmarks and recent files in buffer list
+  (setq ivy-count-format "(%d/%d) ")
+  (setq enable-recursive-minibuffers t)
+
+  (setq ivy-re-builders-alist
+        '((swiper . ivy--regex-plus)
+          (t      . ivy--regex-fuzzy)))   ;; enable fuzzy searching everywhere except for Swiper
+
+  (global-set-key (kbd "s-b") 'ivy-switch-buffer)  ;; Cmd+b show buffers and recent files
+  (global-set-key (kbd "M-s-b") 'ivy-resume))      ;; Alt+Cmd+b resume whatever Ivy was doing
+
+
+;; Swiper is a better local finder.
+(use-package swiper
+  :config
+  (global-set-key "\C-s" 'swiper)       ;; Default Emacs Isearch forward...
+  (global-set-key "\C-r" 'swiper)       ;; ... and Isearch backward replaced with Swiper
+  (global-set-key (kbd "s-f") 'swiper)) ;; Cmd+f find text
+
+
+;; Override the basic Emacs commands
+(use-package counsel
+  :bind* ; load when pressed
+  (("M-x"     . counsel-M-x)
+   ("C-s"     . swiper)
+   ("C-x C-f" . counsel-find-file)
+   ("C-x C-r" . counsel-recentf)  ; search for recently edited
+   ("C-c g"   . counsel-git)      ; search for files in git repo
+   ("C-c j"   . counsel-git-grep) ; search for regexp in git repo
+   ("C-c /"   . counsel-ag)       ; Use ag for regexp
+   ("C-x l"   . counsel-locate)
+   ("C-x C-f" . counsel-find-file)
+   ("<f1> f"  . counsel-describe-function)
+   ("<f1> v"  . counsel-describe-variable)
+   ("<f1> l"  . counsel-find-library)
+   ("<f2> i"  . counsel-info-lookup-symbol)
+   ("<f2> u"  . counsel-unicode-char)
+   ("C-c C-r" . ivy-resume)))     ; Resume last Ivy-based completion
+
+
+(use-package smex)  ;; show recent commands when invoking Alt-x (or Cmd+Shift+p)
+(use-package flx)   ;; enable fuzzy matching
+(use-package avy)   ;; enable avy for quick navigation
+
+
+;; Make Ivy a bit more friendly by adding information to ivy buffers, e.g. description of commands in Alt-x, meta info when switching buffers, etc.
+(use-package ivy-rich
+  :config
+  (ivy-rich-mode 1)
+  (setq ivy-rich-path-style 'abbrev)) ;; Abbreviate paths using abbreviate-file-name (e.g. replace “/home/username” with “~”)
 
 
 ;; Things you'd expect from macOS app.
@@ -113,7 +207,6 @@
 (global-set-key (kbd "s-a") 'mark-whole-buffer)       ;; select all
 (global-set-key (kbd "s-z") 'undo)
 
-
 ;; Delete trailing spaces and add new line in the end of a file on save.
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (setq require-final-newline t)
@@ -121,71 +214,43 @@
 
 ;; Linear undo and redo.
 (use-package undo-fu)
-(global-set-key (kbd "s-z")   'undo-fu-only-undo)
+(global-set-key (kbd "s-z") 'undo-fu-only-undo)
 (global-set-key (kbd "s-Z") 'undo-fu-only-redo)
 
 
-;; =======
-;; VISUALS
+(use-package comment-tags
+  :config
+  (setq comment-tags-keymap-prefix (kbd "C-c t"))
+  (with-eval-after-load "comment-tags"
+    (setq comment-tags-keyword-faces
+          `(("TODO" . ,(list :weight 'bold :foreground "#28ABE3"))
+            ("FIXME" . ,(list :weight 'bold :foreground "#DB3340"))
+            ("BUG" . ,(list :weight 'bold :foreground "#DB3340"))
+            ("HACK" . ,(list :weight 'bold :foreground "#E8B71A"))
+            ("NOTE" . ,(list :weight 'bold :foreground "#F7EAC8"))
+            ("INFO" . ,(list :weight 'bold :foreground "#F7EAC8"))
+            ("DONE" . ,(list :weight 'bold :foreground "#1FDA9A"))))
+    (setq comment-tags-comment-start-only t
+          comment-tags-require-colon t
+          comment-tags-case-sensitive t
+          comment-tags-show-faces t
+          comment-tags-lighter nil))
+  (add-hook 'prog-mode-hook 'comment-tags-mode))
 
 
-;; Enable transparent title bar on macOS
-(when (memq window-system '(mac ns))
-  (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
+;; (defun rainbow-mode-hook ()
+;;   (rainbow-mode 1))
+
+;; (use-package rainbow-mode
+;;   :init
+;;   (add-hook 'prog-mode-hook 'rainbow-mode-hook))
 
 
-;; Font
-(when (member "menlo" (font-family-list))
-  (set-face-attribute 'default nil :font "Menlo 15"))
-(setq-default line-spacing 2)
+;; (use-package highlight-parentheses
+;;   :ensure t)
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-
-;; Nice and simple default light theme.
-(defun my/apply-theme (appearance)
-  "Load theme, taking current system APPEARANCE into consideration."
-  (mapc #'disable-theme custom-enabled-themes)
-  (pcase appearance
-    ('light (load-theme 'almost-mono-white t))
-    ('dark (load-theme 'almost-mono-black t))))
-
-(add-hook 'ns-system-appearance-change-functions #'my/apply-theme)
-
-(use-package almost-mono-themes)
-
-(use-package rainbow-mode)
-
-(defun rainbow-mode-hook ()
-  (rainbow-mode 1))
-(add-hook 'prog-mode-hook 'rainbow-mode-hook)
-
-(use-package highlight-parentheses
-  :ensure t)
-
-(add-hook 'prog-mode-hook #'highlight-parentheses-mode)
-(add-hook 'minibuffer-setup-hook #'highlight-parentheses-minibuffer-setup)
-
-(setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode)
-
-;; Pretty icons
-(use-package all-the-icons)
-;; MUST DO M-x all-the-icons-install-fonts after
-
-
-;; Hide toolbar and scroll bar
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-
-
-;; Always wrap lines
-(global-visual-line-mode 1)
-
-
-;; Highlight current line
-(global-hl-line-mode 1)
-
+;; (add-hook 'prog-mode-hook #'highlight-parentheses-mode)
+;; (add-hook 'minibuffer-setup-hook #'highlight-parentheses-minibuffer-setup)
 
 ;; Show parens and other pairs.
 (use-package smartparens
@@ -202,37 +267,14 @@
   :commands (smartparens-mode show-smartparens-mode))
 
 ;; Set colors to distinguish between active and inactive windows
-(set-face-attribute 'mode-line nil :background "SlateGray1")
-(set-face-attribute 'mode-line-inactive nil :background "grey93")
-
-
-;; File tree
-(use-package neotree
-  :config
-  (setq neo-window-width 32
-        neo-create-file-auto-open t
-        neo-banner-message nil
-        neo-show-updir-line t
-        neo-window-fixed-size nil
-        neo-vc-integration nil
-        neo-mode-line-type 'neotree
-        neo-smart-open t
-        neo-show-hidden-files t
-        neo-mode-line-type 'none
-        neo-auto-indent-point t)
-  (setq neo-theme (if (display-graphic-p) 'nerd 'arrow))
-  (setq neo-hidden-regexp-list '("venv" "\\.pyc$" "~$" "\\.git" "__pycache__" ".DS_Store"))
-  (global-set-key (kbd "s-S") 'neotree-toggle))           ;; Cmd+Shift+b toggle tree
-
+                                        ;(set-face-attribute 'mode-line nil :background "SlateGray1")
+                                        ;(set-face-attribute 'mode-line-inactive nil :background "grey93")
 
 ;; Show vi-like tilde in the fringe on empty lines.
 (use-package vi-tilde-fringe
   :config
   (global-vi-tilde-fringe-mode 1))
 
-
-;; Show full path in the title bar.
-(setq-default frame-title-format "%b (%f)")
 
 ;; https://github.com/Fuco1/.emacs.d/blob/af82072196564fa57726bdbabf97f1d35c43b7f7/site-lisp/redef.el#L20-L94
 (defun Fuco1/lisp-indent-function (indent-point state)
@@ -313,22 +355,16 @@ Lisp function does not specify a special indentation."
 (add-hook 'lisp-mode-hook
           (lambda () (setq-local lisp-indent-function #'Fuco1/lisp-indent-function)))
 
-;; Never use tabs, use spaces instead.
-(setq-default indent-tabs-mode nil) ; Use spaces for indentation
-(setq tab-width 4) ; Set tab width to 2 spaces
-(setq c-basic-offset 4)
-(setq-default c-basic-indent 4)
+(setq inferior-lisp-program "sbcl")
+
+(use-package slime
+  :ensure t)
 
 ;; Show keybindings cheatsheet
 (use-package which-key
   :config
   (which-key-mode)
   (setq which-key-idle-delay 0.5))
-
-
-;; ================
-;; BASIC NAVIGATION
-
 
 ;; Kill line with CMD-Backspace. Note that thanks to Simpleclip, killing doesn't rewrite the system clipboard.
 ;; Kill one word with Alt+Backspace.
@@ -403,21 +439,6 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "s-<") 'previous-buffer)
 (global-set-key (kbd "s->") 'next-buffer)
 
-;; ============
-;; TEXT EDITING
-
-(use-package evil
-  :demand t
-  :bind (("<escape>" . keyboard-escape-quit))
-  :init
-  ;; allows for using cgn
-  (setq evil-search-module 'evil-search)
-  (setq evil-want-keybinding nil)
-  ;; no vim insert bindings
-  (setq evil-undo-system 'undo-fu)
-  :config
-  (evil-mode 1))
-
 (use-package evil-easymotion
   :config
   (evilem-default-keybindings "SPC"))
@@ -427,7 +448,6 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (global-set-key (kbd "s-'") 'er/expand-region)         ;; Cmd+' (apostrophe) to expand
   (global-set-key (kbd "s-\"") 'er/contract-region))     ;; Cmd+" (same, but with shift) to contract
-
 
 ;; Quickly insert new lines above or below the current line, with correct indentation.
 (defun smart-open-line ()
@@ -446,7 +466,6 @@ point reaches the beginning or end of the buffer, stop there."
 
 (global-set-key (kbd "s-<return>") 'smart-open-line)            ;; Cmd+Return new line below
 (global-set-key (kbd "s-S-<return>") 'smart-open-line-above)    ;; Cmd+Shift+Return new line above
-
 
 ;; Upcase and lowercase word or region, if selected.
 ;; To capitalize or un-capitalize word use Alt+c and Alt+l
@@ -473,12 +492,6 @@ point reaches the beginning or end of the buffer, stop there."
   (global-set-key (kbd "s-D") 'mc/mark-all-dwim)              ;; Cmd+Shift+d select all occurrences
   (global-set-key (kbd "M-s-d") 'mc/edit-beginnings-of-lines) ;; Alt+Cmd+d add cursor to each line in region
   (define-key mc/keymap (kbd "<return>") nil))
-
-
-
-;; =================
-;; WINDOW MANAGEMENT
-
 
 ;; This is rather radical, but saves from a lot of pain in the ass.
 ;; When split is automatic, always split windows vertically
@@ -515,75 +528,6 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "M-s-[") 'winner-undo)
 (global-set-key (kbd "M-s-]") 'winner-redo)
 
-;; ==========================================
-;; MENUS AND COMPLETION (not code completion)
-
-
-;; Use minimalist Ivy for most things.
-(use-package ivy
-  :diminish                             ;; don't show Ivy in minor mode list
-  :config
-  (ivy-mode 1)                          ;; enable Ivy everywhere
-  (setq ivy-use-virtual-buffers t)      ;; show bookmarks and recent files in buffer list
-  (setq ivy-count-format "(%d/%d) ")
-  (setq enable-recursive-minibuffers t)
-
-  (setq ivy-re-builders-alist
-        '((swiper . ivy--regex-plus)
-          (t      . ivy--regex-fuzzy)))   ;; enable fuzzy searching everywhere except for Swiper
-
-  (global-set-key (kbd "s-b") 'ivy-switch-buffer)  ;; Cmd+b show buffers and recent files
-  (global-set-key (kbd "M-s-b") 'ivy-resume))      ;; Alt+Cmd+b resume whatever Ivy was doing
-
-
-;; Swiper is a better local finder.
-(use-package swiper
-  :config
-  (global-set-key "\C-s" 'swiper)       ;; Default Emacs Isearch forward...
-  (global-set-key "\C-r" 'swiper)       ;; ... and Isearch backward replaced with Swiper
-  (global-set-key (kbd "s-f") 'swiper)) ;; Cmd+f find text
-
-
-;; Better menus with Counsel (a layer on top of Ivy)
-(use-package counsel
-  :config
-  (global-set-key (kbd "M-x") 'counsel-M-x)            ;; Alt+x run command
-  (global-set-key (kbd "s-P") 'counsel-M-x)            ;; Cmd+Shift+p run command
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)  ;; Replace built-in Emacs 'find file' (open file) with Counsel
-  (global-set-key (kbd "s-o") 'counsel-find-file))     ;; Cmd+o open file
-
-(use-package smex)  ;; show recent commands when invoking Alt-x (or Cmd+Shift+p)
-(use-package flx)   ;; enable fuzzy matching
-(use-package avy)   ;; enable avy for quick navigation
-
-
-;; Make Ivy a bit more friendly by adding information to ivy buffers, e.g. description of commands in Alt-x, meta info when switching buffers, etc.
-(use-package ivy-rich
-  :config
-  (ivy-rich-mode 1)
-  (setq ivy-rich-path-style 'abbrev)) ;; Abbreviate paths using abbreviate-file-name (e.g. replace “/home/username” with “~”)
-
-
-;; Integrate Projectile with Counsel
-(use-package counsel-projectile
-  :config
-  (counsel-projectile-mode 1)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "s-p") 'counsel-projectile-find-file)         ;; Cmd+p open file in current project
-  (global-set-key (kbd "s-F") 'counsel-projectile-rg))     ;; Cmd+Shift+F search in current git repository
-
-
-(setq projectile-completion-system 'ivy)             ;; Use Ivy in Projectile
-
-(use-package aggressive-indent
-  :config
-  (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
-  (add-hook 'lisp-mode-hook #'aggressive-indent-mode)
-  (add-hook 'lisp-interaction-mode-hook #'aggressive-indent-mode))
-
-;; ========================
-;; Version CONTROL WITH GIT
-
 
 ;; Magit
 (use-package magit
@@ -601,48 +545,11 @@ point reaches the beginning or end of the buffer, stop there."
   (set-face-foreground 'git-gutter:deleted "red"))
 
 
-;; ========
-;; TERMINAL
-
-
 (use-package shell-pop
   :config
   (custom-set-variables
    '(shell-pop-shell-type (quote ("ansi-term" "*ansi-term*" (lambda nil (ansi-term shell-pop-term-shell)))))
    '(shell-pop-universal-key "s-=")))
-
-
-;; ===============
-;; CODE COMPLETION
-
-(use-package company
-  :config
-  (setq company-idle-delay 0.1)
-  (setq company-global-modes '(not org-mode))
-  (setq company-minimum-prefix-length 1)
-  (add-hook 'after-init-hook 'global-company-mode))
-
-(use-package comment-tags
-  :config
-  (setq comment-tags-keymap-prefix (kbd "C-c t"))
-  (with-eval-after-load "comment-tags"
-    (setq comment-tags-keyword-faces
-          `(("TODO" . ,(list :weight 'bold :foreground "#28ABE3"))
-            ("FIXME" . ,(list :weight 'bold :foreground "#DB3340"))
-            ("BUG" . ,(list :weight 'bold :foreground "#DB3340"))
-            ("HACK" . ,(list :weight 'bold :foreground "#E8B71A"))
-            ("NOTE" . ,(list :weight 'bold :foreground "#F7EAC8"))
-            ("INFO" . ,(list :weight 'bold :foreground "#F7EAC8"))
-            ("DONE" . ,(list :weight 'bold :foreground "#1FDA9A"))))
-    (setq comment-tags-comment-start-only t
-          comment-tags-require-colon t
-          comment-tags-case-sensitive t
-          comment-tags-show-faces t
-          comment-tags-lighter nil))
-  (add-hook 'prog-mode-hook 'comment-tags-mode))
-
-;; ===========================
-;; SPELLCHECKING AND THESAURUS
 
 
 ;; Spellchecking requires an external command to be available. Install aspell on your Mac, then make it the default checker for Emacs' ispell. Note that personal dictionary is located at ~/.aspell.LANG.pws by default.
@@ -666,11 +573,6 @@ point reaches the beginning or end of the buffer, stop there."
      (define-key flyspell-mouse-map [mouse-3] #'undefined)))
 
 
-;; Spellcheck current word
-(define-key flyspell-mode-map (kbd "s-\\") 'flyspell-correct-previous-word-generic) ;; Cmd+\ spellcheck word with popup
-(define-key flyspell-mode-map (kbd "C-s-\\") 'ispell-word)                          ;; Ctrl+Cmd+\ spellcheck word using built UI
-
-
 ;; Search for synonyms
 (use-package powerthesaurus
   :config
@@ -682,9 +584,43 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (global-set-key (kbd "M-\\") 'define-word-at-point))
 
-;; ========
-;; ORG MODE
 
+(use-package company
+  :config
+  (setq company-idle-delay 0.1)
+  (setq company-global-modes '(not org-mode))
+  (setq company-minimum-prefix-length 1)
+  (add-hook 'after-init-hook 'global-company-mode))
+
+
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         ;; (XXX-mode . lsp)
+         ;; (XXX-mode . lsp-deferred)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands (lsp lsp-deferred))
+
+(use-package lsp-treemacs
+  :after lsp)
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are helm user
+;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+
+;; ORG MODE
 
 ;; Some basic Org defaults
 (use-package org
@@ -704,45 +640,3 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;; And all of those files should be in included agenda.
 (setq org-agenda-files '("~/org"))
-
-
-;; Open config file by pressing C-x and then C
-(global-set-key (kbd "C-x C") (lambda () (interactive) (find-file "~/.emacs.d/init.el")))
-
-;; Open private config file by pressing C-x and then c
-;; Contain custom settings to private.el to ensure easy Castlemacs updates.
-(global-set-key (kbd "C-x c") (lambda () (interactive) (find-file "~/.emacs.d/private.el")))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("8f5b54bf6a36fe1c138219960dd324aad8ab1f62f543bed73ef5ad60956e36ae"
-     "cbd85ab34afb47003fa7f814a462c24affb1de81ebf172b78cb4e65186ba59d2"
-     "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4"
-     default))
- '(package-selected-packages
-   '(aggressive-indent all-the-icons avy cider-eval-sexp-fu clj-refactor
-                       company company-c-headers company-irony
-                       counsel-projectile define-word evil
-                       evil-easymotion evil-smartparens
-                       exec-path-from-shell expand-region flx
-                       flyspell-correct-popup git-gutter irony
-                       ivy-rich lsp-mode magit move-text
-                       multiple-cursors neotree powerthesaurus
-                       rainbow-delimiter rainbow-delimiter-mode
-                       rainbow-delimiters rainbow-mode rich-minority
-                       shell-pop simpleclip slime smartparens
-                       smartparens-config smex undo-fu vi-tilde-fringe
-                       visual-regexp which-key yaml-mode))
- '(shell-pop-shell-type
-   '("ansi-term" "*ansi-term*"
-     (lambda nil (ansi-term shell-pop-term-shell))))
- '(shell-pop-universal-key "s-="))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
