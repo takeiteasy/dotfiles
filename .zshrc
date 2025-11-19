@@ -1,4 +1,4 @@
-export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:/opt/homebrew/bin:$PATH
 export ZSH="$HOME/.oh-my-zsh"
 # zstyle ':omz:update' mode disabled  # disable automatic updates
 zstyle ':omz:update' mode auto      # update automatically without asking
@@ -33,6 +33,7 @@ plugins=(
 	brew
 	docker
 	docker-compose
+	eza
 	fancy-ctrl-z
 	fzf
 	gem
@@ -56,20 +57,19 @@ source $ZSH/oh-my-zsh.sh
 export LANG=en_US.UTF-8
 export EDITOR='emacs -nw'
 
-eval $(thefuck --alias)
-
 export OS=Darwin
 export PATH="/opt/homebrew/bin:$HOME/.local/bin:$HOME/.qlot/bin:/opt/homebrew/opt/llvm/bin:$HOME/.qlot/bin:$PATH"
 export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
 export OLLAMA_ORIGINS="*"
 
+alias rm="trash"
 alias bake="bear -- make"
 alias xcodebuild="xcodebuild -arch arm64"
 alias sbcl="rlwrap sbcl"
-if [ -d "/Applications/Emacs.app/Contents/MacOS/bin" ]; then
-  export PATH="/Applications/Emacs.app/Contents/MacOS/bin:$PATH"
-  alias emacs="emacs -nw" # Always launch "emacs" in terminal mode.
-fi
+#if [ -d "/Applications/Emacs.app/Contents/MacOS/bin" ]; then
+#  export PATH="/Applications/Emacs.app/Contents/MacOS/bin:$PATH"
+#  alias emacs="emacs -nw" # Always launch "emacs" in terminal mode.
+#fi
 
 bindkey -v
 setopt PROMPT_SUBST
@@ -131,3 +131,11 @@ function rprompt_path {
 
 RPROMPT='$(rprompt_path)'
 
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+eval $(thefuck --alias)
+
+# Added by Antigravity
+export PATH="/Users/george/.antigravity/antigravity/bin:$PATH"
